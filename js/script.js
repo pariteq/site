@@ -72,30 +72,76 @@ document.querySelectorAll('.service-card, .problem-item, .reason-item, .feature-
     observer.observe(el);
 });
 
-// Contact form handling
+// EmailJS Configuration
+(function() {
+    // Initialize EmailJS with your public key
+    emailjs.init("wBXPutonv4rjHIb9G");
+})();
+
+// Contact form handling with EmailJS
 if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const submitBtn = contactForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
+        if (!validateForm(contactForm)) {
+            showNotification('Por favor, completa todos los campos correctamente.', 'error');
+            return;
+        }
+        
+        const submitBtn = contactForm.querySelector('#submitBtn');
+        const btnText = contactForm.querySelector('#btnText');
+        const formMessage = contactForm.querySelector('#formMessage');
+        const originalText = btnText.innerHTML;
         
         // Show loading state
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        btnText.innerHTML = 'Enviando...';
         submitBtn.disabled = true;
+        submitBtn.querySelector('i').className = 'fas fa-spinner fa-spin';
         
-        // Simulate form submission (replace with actual form handling)
-        setTimeout(() => {
+        // Prepare form data
+        const formData = {
+            from_name: contactForm.querySelector('input[name="from_name"]').value,
+            from_email: contactForm.querySelector('input[name="from_email"]').value,
+            company: contactForm.querySelector('input[name="company"]').value,
+            phone: contactForm.querySelector('input[name="phone"]').value,
+            message: contactForm.querySelector('textarea[name="message"]').value,
+            to_email: 'pariteq@gmail.com'
+        };
+        
+        try {
+            // Send email using EmailJS
+            const response = await emailjs.send(
+                'service_k5tiumf',    // Your service ID
+                'template_gduzeio',   // Your template ID
+                formData
+            );
+            
             // Show success message
-            showNotification('¡Gracias! Te contactaremos pronto.', 'success');
+            showNotification('¡Gracias! Tu consulta ha sido enviada. Te contactaremos pronto para programar tu sesión estratégica.', 'success');
             
             // Reset form
             contactForm.reset();
             
-            // Reset button
-            submitBtn.innerHTML = originalText;
+            // Show success in form area
+            formMessage.innerHTML = '<div style="color: #10b981; text-align: center; font-weight: 500;"><i class="fas fa-check-circle"></i> Mensaje enviado correctamente</div>';
+            
+        } catch (error) {
+            console.error('EmailJS Error:', error);
+            showNotification('Hubo un error al enviar el formulario. Por favor, intenta nuevamente o escríbenos directamente a pariteq@gmail.com', 'error');
+            
+            // Show error in form area
+            formMessage.innerHTML = '<div style="color: #ef4444; text-align: center; font-weight: 500;"><i class="fas fa-exclamation-triangle"></i> Error al enviar. Intenta nuevamente.</div>';
+        } finally {
+            // Reset button state
+            btnText.innerHTML = originalText;
             submitBtn.disabled = false;
-        }, 2000);
+            submitBtn.querySelector('i').className = 'fas fa-paper-plane';
+            
+            // Clear form message after 5 seconds
+            setTimeout(() => {
+                formMessage.innerHTML = '';
+            }, 5000);
+        }
     });
 }
 
@@ -322,40 +368,3 @@ function validateForm(form) {
     return isValid;
 }
 
-// Enhanced form submission
-if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        if (!validateForm(contactForm)) {
-            showNotification('Por favor, completa todos los campos correctamente.', 'error');
-            return;
-        }
-        
-        const submitBtn = contactForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-        submitBtn.disabled = true;
-        contactForm.classList.add('loading');
-        
-        try {
-            // Here you would typically send the form data to your server
-            // const formData = new FormData(contactForm);
-            // const response = await fetch('/contact', { method: 'POST', body: formData });
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            showNotification('¡Gracias! Te contactaremos pronto para programar tu consulta estratégica.', 'success');
-            contactForm.reset();
-            
-        } catch (error) {
-            showNotification('Hubo un error al enviar el formulario. Por favor, intenta nuevamente.', 'error');
-        } finally {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-            contactForm.classList.remove('loading');
-        }
-    });
-}

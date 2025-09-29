@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -298,20 +299,21 @@
                 <div class="cta-form">
                     <h3>Agenda tu Consulta Gratuita - Empezar Ahora</h3>
                     <p class="form-subtitle">Descubre cómo podemos automatizar tus procesos críticos en una sesión estratégica sin costo.</p>
-                    <form class="contact-form">
+                    <form class="contact-form" id="contactForm">
                         <div class="form-row">
-                            <input type="text" placeholder="Nombre completo" required>
-                            <input type="email" placeholder="Email empresarial" required>
+                            <input type="text" name="from_name" placeholder="Nombre completo" required>
+                            <input type="email" name="from_email" placeholder="Email empresarial" required>
                         </div>
                         <div class="form-row">
-                            <input type="text" placeholder="Empresa" required>
-                            <input type="tel" placeholder="Teléfono" required>
+                            <input type="text" name="company" placeholder="Empresa" required>
+                            <input type="tel" name="phone" placeholder="Teléfono" required>
                         </div>
-                        <textarea placeholder="Cuéntanos sobre tus procesos que te gustaría automatizar..." rows="4"></textarea>
-                        <button type="submit" class="btn btn-primary btn-large">
+                        <textarea name="message" placeholder="Cuéntanos sobre tus procesos que te gustaría automatizar..." rows="4" required></textarea>
+                        <button type="submit" class="btn btn-primary btn-large" id="submitBtn">
                             <i class="fas fa-paper-plane"></i>
-                            Solicitar Consulta Estratégica Gratuita
+                            <span id="btnText">Solicitar Consulta Estratégica Gratuita</span>
                         </button>
+                        <div id="formMessage" class="form-message"></div>
                     </form>
                 </div>
             </div>
