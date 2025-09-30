@@ -104,8 +104,7 @@ if (contactForm) {
             from_email: contactForm.querySelector('input[name="from_email"]').value,
             company: contactForm.querySelector('input[name="company"]').value,
             phone: contactForm.querySelector('input[name="phone"]').value,
-            message: contactForm.querySelector('textarea[name="message"]').value,
-            to_email: 'pariteq@gmail.com'
+            message: contactForm.querySelector('textarea[name="message"]').value
         };
         
         try {
