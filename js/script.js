@@ -40,9 +40,12 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+            // Calculate offset to account for fixed navbar
+            const offsetTop = target.offsetTop - 80;
+            
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
             });
             
             // Close mobile menu if open
@@ -234,16 +237,16 @@ serviceCards.forEach((card, index) => {
     card.style.animationDelay = `${index * 0.2}s`;
 });
 
-// Parallax effect for hero section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const parallax = document.querySelector('.hero');
-    const speed = scrolled * 0.5;
-    
-    if (parallax) {
-        parallax.style.transform = `translateY(${speed}px)`;
-    }
-});
+// Parallax effect for hero section - DISABLED to fix scroll jumping
+// window.addEventListener('scroll', () => {
+//     const scrolled = window.pageYOffset;
+//     const parallax = document.querySelector('.hero');
+//     const speed = scrolled * 0.5;
+//     
+//     if (parallax) {
+//         parallax.style.transform = `translateY(${speed}px)`;
+//     }
+// });
 
 // Counter animation for stats (if needed)
 function animateCounter(element, target) {
@@ -259,39 +262,10 @@ function animateCounter(element, target) {
     }, 20);
 }
 
-// Initialize mobile menu styles
+// Initialize mobile menu styles - moved to CSS file
 function initMobileMenu() {
-    const style = document.createElement('style');
-    style.textContent = `
-        @media (max-width: 768px) {
-            .nav-menu {
-                position: fixed;
-                top: 80px;
-                right: -100%;
-                width: 100%;
-                height: calc(100vh - 80px);
-                background: rgba(255, 255, 255, 0.98);
-                backdrop-filter: blur(10px);
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: center;
-                padding-top: 2rem;
-                transition: right 0.3s ease;
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            }
-            
-            .nav-menu.active {
-                right: 0;
-            }
-            
-            .nav-menu .nav-link,
-            .nav-menu .btn {
-                margin: 1rem 0;
-                font-size: 1.1rem;
-            }
-        }
-    `;
-    document.head.appendChild(style);
+    // Mobile menu styles are now in CSS file
+    // This function is kept for compatibility but no longer needed
 }
 
 // Initialize everything when DOM is loaded
