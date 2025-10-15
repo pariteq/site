@@ -129,7 +129,7 @@ if (contactForm) {
             
         } catch (error) {
             console.error('EmailJS Error:', error);
-            showNotification('Hubo un error al enviar el formulario. Por favor, intenta nuevamente o escríbenos directamente a pariteq@gmail.com', 'error');
+            showNotification('Hubo un error al enviar el formulario. Por favor, intenta nuevamente o escríbenos directamente a junior@pariteq.com', 'error');
             
             // Show error in form area
             formMessage.innerHTML = '<div style="color: #ef4444; text-align: center; font-weight: 500;"><i class="fas fa-exclamation-triangle"></i> Error al enviar. Intenta nuevamente.</div>';
