@@ -75,75 +75,45 @@ document.querySelectorAll('.service-card, .problem-item, .reason-item, .feature-
     observer.observe(el);
 });
 
-// EmailJS Configuration
-(function() {
-    // Initialize EmailJS with your public key
-    emailjs.init("wBXPutonv4rjHIb9G");
-})();
-
-// Contact form handling with EmailJS
+// --- MANEJO DEL FORMULARIO CON WHATSAPP ---
 if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
+    contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
+        // 1. Validar el formulario antes de enviar
         if (!validateForm(contactForm)) {
-            showNotification('Por favor, completa todos los campos correctamente.', 'error');
+            showNotification('Por favor, completa todos los campos requeridos.', 'error');
             return;
         }
         
-        const submitBtn = contactForm.querySelector('#submitBtn');
-        const btnText = contactForm.querySelector('#btnText');
-        const formMessage = contactForm.querySelector('#formMessage');
-        const originalText = btnText.innerHTML;
+        // 2. Obtener los datos del formulario
+        const name = contactForm.querySelector('input[name="from_name"]').value;
+        const email = contactForm.querySelector('input[name="from_email"]').value;
+        const company = contactForm.querySelector('input[name="company"]').value;
+        const phone = contactForm.querySelector('input[name="phone"]').value;
+        const message = contactForm.querySelector('textarea[name="message"]').value;
         
-        // Show loading state
-        btnText.innerHTML = 'Enviando...';
-        submitBtn.disabled = true;
-        submitBtn.querySelector('i').className = 'fas fa-spinner fa-spin';
+        // 3. Configurar el número de destino (CAMBIA ESTO POR TU NÚMERO)
+        // Formato internacional sin símbolos '+' (ej: 595981123456)
+        const whatsappNumber = "595984842795"; 
+
+        // 4. Construir el mensaje formateado
+        const text = `*Nueva consulta desde la web*%0A%0A` +
+                     `👤 *Nombre:* ${name}%0A` +
+                     `📧 *Email:* ${email}%0A` +
+                     `🏢 *Empresa:* ${company}%0A` +
+                     `📱 *Teléfono:* ${phone}%0A%0A` +
+                     `💬 *Mensaje:*%0A${message}`;
+
+        // 5. Crear la URL de WhatsApp
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
+
+        // 6. Abrir WhatsApp en una nueva pestaña
+        window.open(whatsappUrl, '_blank');
         
-        // Prepare form data
-        const formData = {
-            from_name: contactForm.querySelector('input[name="from_name"]').value,
-            from_email: contactForm.querySelector('input[name="from_email"]').value,
-            company: contactForm.querySelector('input[name="company"]').value,
-            phone: contactForm.querySelector('input[name="phone"]').value,
-            message: contactForm.querySelector('textarea[name="message"]').value
-        };
-        
-        try {
-            // Send email using EmailJS
-            const response = await emailjs.send(
-                'service_k5tiumf',    // Your service ID
-                'template_gduzeio',   // Your template ID
-                formData
-            );
-            
-            // Show success message
-            showNotification('¡Gracias! Tu consulta ha sido enviada. Te contactaremos pronto para programar tu sesión estratégica.', 'success');
-            
-            // Reset form
-            contactForm.reset();
-            
-            // Show success in form area
-            formMessage.innerHTML = '<div style="color: #10b981; text-align: center; font-weight: 500;"><i class="fas fa-check-circle"></i> Mensaje enviado correctamente</div>';
-            
-        } catch (error) {
-            console.error('EmailJS Error:', error);
-            showNotification('Hubo un error al enviar el formulario. Por favor, intenta nuevamente o escríbenos directamente a junior@pariteq.com', 'error');
-            
-            // Show error in form area
-            formMessage.innerHTML = '<div style="color: #ef4444; text-align: center; font-weight: 500;"><i class="fas fa-exclamation-triangle"></i> Error al enviar. Intenta nuevamente.</div>';
-        } finally {
-            // Reset button state
-            btnText.innerHTML = originalText;
-            submitBtn.disabled = false;
-            submitBtn.querySelector('i').className = 'fas fa-paper-plane';
-            
-            // Clear form message after 5 seconds
-            setTimeout(() => {
-                formMessage.innerHTML = '';
-            }, 5000);
-        }
+        // Opcional: Resetear el formulario o mostrar mensaje de éxito
+        contactForm.reset();
+        showNotification('Redirigiendo a WhatsApp...', 'success');
     });
 }
 
@@ -237,41 +207,8 @@ serviceCards.forEach((card, index) => {
     card.style.animationDelay = `${index * 0.2}s`;
 });
 
-// Parallax effect for hero section - DISABLED to fix scroll jumping
-// window.addEventListener('scroll', () => {
-//     const scrolled = window.pageYOffset;
-//     const parallax = document.querySelector('.hero');
-//     const speed = scrolled * 0.5;
-//     
-//     if (parallax) {
-//         parallax.style.transform = `translateY(${speed}px)`;
-//     }
-// });
-
-// Counter animation for stats (if needed)
-function animateCounter(element, target) {
-    let current = 0;
-    const increment = target / 100;
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            current = target;
-            clearInterval(timer);
-        }
-        element.textContent = Math.floor(current);
-    }, 20);
-}
-
-// Initialize mobile menu styles - moved to CSS file
-function initMobileMenu() {
-    // Mobile menu styles are now in CSS file
-    // This function is kept for compatibility but no longer needed
-}
-
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    initMobileMenu();
-    
     // Add loading animation to page
     document.body.style.opacity = '0';
     document.body.style.transition = 'opacity 0.5s ease';
@@ -340,4 +277,3 @@ function validateForm(form) {
     
     return isValid;
 }
-

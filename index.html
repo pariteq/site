@@ -6,17 +6,15 @@
     <title>Pariteq - Automatización de Procesos Críticos con IA y Robótica</title>
     <meta name="description" content="Especialistas en automatización de procesos, IA estratégica y robótica avanzada para empresas que buscan escalar sin límites.">
     
-    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <link rel="shortcut icon" href="img/favicon.ico">
     
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-</head>
+    
+    </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
@@ -38,7 +36,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-background">
             <div class="hero-shapes">
@@ -84,7 +81,6 @@
         </div>
     </section>
 
-    <!-- Productos Section -->
     <section id="productos" class="products">
         <div class="container">
             <h2 class="section-title">Nuestros Productos</h2>
@@ -195,9 +191,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Problema/Solución Section -->
     <section class="problem-solution">
         <div class="container">
             <h2 class="section-title">¿Tu empresa pierde tiempo y dinero en procesos manuales?</h2>
@@ -229,7 +225,6 @@
         </div>
     </section>
 
-    <!-- Servicios Section -->
     <section id="servicios" class="services">
         <div class="container">
             <h2 class="section-title">Nuestras Especialidades Tecnológicas</h2>
@@ -262,7 +257,6 @@
         </div>
     </section>
 
-    <!-- Por Qué Elegirnos Section -->
     <section id="nosotros" class="why-choose-us">
         <div class="container">
             <h2 class="section-title">¿Por Qué las Empresas Eligen Pariteq?</h2>
@@ -291,7 +285,6 @@
         </div>
     </section>
 
-    <!-- CTA Final Section -->
     <section id="contacto" class="final-cta">
         <div class="container">
             <div class="cta-content">
@@ -304,6 +297,7 @@
                 <div class="cta-form">
                     <h3>Agenda tu Consulta Gratuita - Empezar Ahora</h3>
                     <p class="form-subtitle">Descubre cómo podemos automatizar tus procesos críticos en una sesión estratégica sin costo.</p>
+                    
                     <form class="contact-form" id="contactForm">
                         <div class="form-row">
                             <input type="text" name="from_name" placeholder="Nombre completo" required>
@@ -325,7 +319,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -347,13 +340,16 @@
                     <div class="footer-column">
                         <h4>Contacto</h4>
                         <a href="#nosotros">¿Por Qué Elegirnos?</a>
-                        <a href="mailto:junior@pariteq.com">junior@pariteq.com</a>
+                        <a href="mailto:pariteq@gmail.com">pariteq@gmail.com</a>
                         <a href="https://wa.me/595984842795" target="_blank">+595 984 842 795</a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Pariteq. Todos los derechos reservados.</p>
+                <p>&copy; <span id="currentYear"></span> Pariteq. Todos los derechos reservados.</p>
+                <script>
+                    document.getElementById('currentYear').textContent = new Date().getFullYear();
+                </script>
                 <div class="social-links">
                     <a href="https://www.instagram.com/pariteq_py/" target="_blank" title="Síguenos en Instagram"><i class="fab fa-instagram"></i></a>
                     <a href="https://wa.me/595984842795" target="_blank" title="Contáctanos por WhatsApp"><i class="fab fa-whatsapp"></i></a>
