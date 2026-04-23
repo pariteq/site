@@ -1,0 +1,19 @@
+{
+  "redirect_base": "https://app.agendorabarber.com/registro",
+  "referidos": [
+    {
+      "id": "1",
+      "nombre": "HomePro",
+      "icon": "img/homepro.png",
+      "descripcion": "Tienda de productos para barberías",
+      "ref_param": "homepro"
+    },
+    {
+      "id": "2",
+      "nombre": "Redes y Sitio Web Agendora",
+      "icon": "📆",
+      "descripcion": "Instagram, Facebook, Sitio Web de Agendora",
+      "ref_param": "agendora"
+    }
+  ]
+}

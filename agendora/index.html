@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agendora Barber — Tu Barbería, Más Organizada</title>
+<meta name="description" content="El sistema que organiza tu barbería automáticamente. Tus clientes reservan solos, reciben recordatorios y tú cobras más.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & BASE ─── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --blue:#033faa;--blue-l:#1a56cc;--blue-b:#6b9fff;
+  --red:#db1c2b;--red-l:#f02637;--red-b:#ff6677;
+  --gold:#c9922a;--gold-l:#e8b84b;--gold-p:#f7df9a;
+  --dark:#0e0804;--dark2:#1a0d05;--brown:#2d1a0a;
+  --cream:#f5ede0;--cream2:#fff9f2;--muted:#9e8870;--muted-l:#c4b09a;
+  --card:rgba(22,12,4,.94);--bg:rgba(201,146,42,.35);--bb:rgba(3,63,170,.35);
+}
+body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.65}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.08}
+.bebas{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em}
+.mono{font-family:'Space Mono',monospace}
+.container{max-width:1160px;margin:0 auto;padding:0 1.75rem}
+
+/* ─── SCROLL FADE ─── */
+.fu{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.fu.vis{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+.d4{transition-delay:.4s}.d5{transition-delay:.5s}
+
+/* ─── TAG ─── */
+.tag{display:inline-flex;align-items:center;gap:8px;background:rgba(201,146,42,.12);border:1px solid rgba(201,146,42,.45);color:var(--gold-l);padding:5px 15px;border-radius:2px;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:1.2rem}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;gap:9px;padding:15px 32px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:.04em;text-decoration:none;text-transform:uppercase;border-radius:4px;transition:all .28s;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transition:left .5s}
+.btn:hover::after{left:150%}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:var(--dark);box-shadow:0 4px 24px rgba(201,146,42,.35)}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(201,146,42,.55)}
+.btn-outline{background:transparent;border:2px solid rgba(255,255,255,.22);color:var(--cream)}
+.btn-outline:hover{border-color:var(--gold-l);color:var(--gold-l);transform:translateY(-2px)}
+.btn-glass{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;backdrop-filter:blur(8px)}
+.btn-glass:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+
+/* ─── KEYFRAMES ─── */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
+@keyframes pole{from{background-position:0 0}to{background-position:0 90px}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.55)}}
+@keyframes shimmer{0%,100%{background-position:0%}50%{background-position:100%}}
+@keyframes notifIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes gradMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes modalIn{from{opacity:0;transform:scale(.88) translateY(22px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes shine{0%{left:-100%}100%{left:200%}}
+
+/* ─── NAVBAR ─── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:800;background:rgba(14,8,4,.9);backdrop-filter:blur(18px);border-bottom:1px solid rgba(201,146,42,.25);transition:all .3s}
+.nav-in{max-width:1160px;margin:0 auto;padding:0 1.75rem;display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo-icon{width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue-l));display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;overflow:hidden;position:relative}
+.logo-icon img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+.logo-icon::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:shine 3s infinite}
+.logo-text{font-family:'DM Sans',sans-serif;font-weight:900;font-size:1.05rem;color:var(--cream)}
+.logo-text em{color:var(--gold-l);font-style:normal}
+.nav-links{display:flex;align-items:center;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted-l);text-decoration:none;font-size:.82rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--gold-l)}
+.nav-cta{padding:11px 20px;font-size:.8rem}
+
+/* ─── HERO ─── */
+#hero{min-height:100vh;position:relative;display:flex;align-items:center;padding-top:68px;overflow:hidden}
+.hero-bg-photo{position:absolute;inset:0;background:url('img/sillas.jpg') center center/cover no-repeat;opacity:.42;transform:scale(1.03)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 65% 45%,rgba(3,63,170,.14) 0%,transparent 65%),radial-gradient(ellipse 55% 70% at 15% 65%,rgba(201,146,42,.07) 0%,transparent 55%),radial-gradient(ellipse 40% 40% at 85% 80%,rgba(219,28,43,.1) 0%,transparent 50%),linear-gradient(170deg,rgba(28,14,5,.62) 0%,rgba(13,6,2,.48) 50%,rgba(22,11,4,.68) 100%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(201,146,42,.065) 1px,transparent 1px),linear-gradient(90deg,rgba(201,146,42,.065) 1px,transparent 1px);background-size:55px 55px;mask-image:radial-gradient(ellipse at center,black 20%,transparent 75%)}
+.pole{position:absolute;top:0;bottom:0;width:7px;background:repeating-linear-gradient(-45deg,var(--red) 0px,var(--red) 18px,#fff 18px,#fff 26px,var(--blue) 26px,var(--blue) 44px,#fff 44px,#fff 52px);background-size:100px 100px;animation:pole 3.5s linear infinite;opacity:.55}
+.pole-r{right:0}.pole-r2{right:11px;opacity:.25;width:4px}
+.hero-in{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:0 1.75rem;display:grid;grid-template-columns:1.1fr 1fr;gap:3.5rem;align-items:center;min-height:calc(100vh - 68px)}
+.hero-copy{position:relative;z-index:2}
+.live-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(3,63,170,.2);border:1px solid rgba(3,63,170,.5);color:#7aaaff;padding:6px 14px;border-radius:2px;font-size:.68rem;font-family:'Space Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.5rem}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#7aaaff;animation:pulse 1.5s ease-in-out infinite}
+.hero-title{font-size:clamp(2.6rem,5.5vw,4.6rem);font-weight:900;margin-bottom:1.1rem}
+.ht1{color:var(--cream2);display:block}
+.ht2{color:var(--gold-l);display:block;font-style:italic}
+.ht3{display:block;background:linear-gradient(90deg,var(--blue-b),var(--red-b),var(--gold-l),var(--blue-b));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradMove 4s ease infinite}
+.hero-sub{font-size:1.05rem;color:var(--muted-l);max-width:500px;line-height:1.75;margin-bottom:2.2rem}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.hero-trust{display:flex;gap:1.8rem;flex-wrap:wrap}
+.trust-i{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--muted-l)}
+
+/* ─── DASHBOARD CARD ─── */
+.hero-visual{position:relative}
+.hero-visual .dash-card{display:none}
+.dash-card{background:rgba(18,9,3,.97);border:1px solid rgba(201,146,42,.32);border-radius:16px;padding:1.4rem;box-shadow:0 40px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(201,146,42,.08);animation:float 6s ease-in-out infinite;position:relative;z-index:1}
+.app-shot{display:block;width:100%;max-width:364px;margin:0 auto;border-radius:18px;border:1px solid rgba(201,146,42,.24);box-shadow:0 40px 80px rgba(0,0,0,.55);position:relative;z-index:1}
+.dash-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;padding-bottom:.9rem;border-bottom:1px solid rgba(201,146,42,.2)}
+.dash-title{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--cream)}
+.dash-date{font-size:.68rem;color:var(--muted);font-family:'Space Mono',monospace}
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:1.1rem}
+.sbox{background:rgba(201,146,42,.08);border:1px solid rgba(201,146,42,.2);border-radius:8px;padding:.65rem;text-align:center}
+.sbox.b{background:rgba(3,63,170,.15);border-color:rgba(3,63,170,.3)}
+.sbox.r{background:rgba(219,28,43,.12);border-color:rgba(219,28,43,.3)}
+.snum{font-family:'Bebas Neue',sans-serif;font-size:1.75rem;line-height:1;color:var(--gold-l)}
+.sbox.b .snum{color:#7aaaff}.sbox.r .snum{color:#ff7788}
+.slabel{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.appt-hdr{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.55rem;font-family:'Space Mono',monospace}
+.appt{display:flex;align-items:center;gap:.7rem;padding:.55rem;border-radius:6px;margin-bottom:.35rem;background:rgba(255,255,255,.025);transition:background .2s}
+.appt:hover{background:rgba(201,146,42,.07)}
+.appt-t{font-size:.68rem;color:var(--gold);font-family:'Space Mono',monospace;width:44px}
+.appt-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff;flex-shrink:0}
+.appt-n{font-size:.78rem;color:var(--cream);font-weight:500}
+.appt-s{font-size:.62rem;color:var(--muted)}
+.badge-ok{font-size:.6rem;padding:2px 8px;border-radius:20px;background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.3);white-space:nowrap}
+.badge-pend{font-size:.6rem;padding:2px 8px;border-radius:20px;background:rgba(201,146,42,.15);color:var(--gold-l);border:1px solid rgba(201,146,42,.3);white-space:nowrap}
+.float-notif{position:absolute;top:-26px;right:-18px;background:linear-gradient(135deg,var(--blue),var(--blue-l));border-radius:12px;padding:.7rem 1rem;display:flex;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(3,63,170,.45);animation:notifIn .6s ease, float 6s 1s ease-in-out infinite;z-index:3}
+.float-notif span{font-size:.73rem;font-weight:600;color:#fff;white-space:nowrap}
+.float-rev{position:absolute;bottom:-18px;left:-18px;background:var(--brown);border:1px solid rgba(201,146,42,.32);border-radius:12px;padding:.7rem 1rem;box-shadow:0 8px 28px rgba(0,0,0,.45);animation:float 6s 3s ease-in-out infinite;z-index:2}
+.rev-l{font-size:.62rem;color:var(--muted);margin-bottom:1px}
+.rev-v{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold-l)}
+.rev-c{font-size:.62rem;color:#34d399}
+
+/* ─── STATS BAND ─── */
+.stats-band{background:linear-gradient(135deg,var(--brown),#1e0e06);border-top:1px solid rgba(201,146,42,.28);border-bottom:1px solid rgba(201,146,42,.28);padding:1.26rem 0}
+.stats-in{max-width:1160px;margin:0 auto;padding:0 1.75rem;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-i{text-align:center;padding:1rem 1.5rem;border-right:1px solid rgba(201,146,42,.2)}
+.stat-i:last-child{border-right:none}
+.stat-big{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;line-height:1;background:linear-gradient(135deg,var(--gold),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-desc{font-size:.78rem;color:var(--muted-l);margin-top:3px}
+
+/* ─── TEAM ─── */
+#leadership{padding:36px 0;background:linear-gradient(180deg,#120804 0%,#1a0d05 100%);border-top:1px solid rgba(201,146,42,.12);border-bottom:1px solid rgba(201,146,42,.12);position:relative;overflow:hidden}
+#leadership::before{content:'';position:absolute;inset:0;background:url('img/agendora-oficial-min.png') left 18% center/560px 560px no-repeat;opacity:.13;filter:grayscale(1) brightness(1.08);mask-image:radial-gradient(circle at 32% 50%,black 0%,black 34%,transparent 72%);-webkit-mask-image:radial-gradient(circle at 32% 50%,black 0%,black 34%,transparent 72%);pointer-events:none}
+.leadership-wrap{max-width:980px;margin:0 auto;padding:0 1.75rem;text-align:center}
+.leadership-photo{max-width:720px;margin:0 auto;border-radius:20px;overflow:hidden;border:1px solid rgba(201,146,42,.28);box-shadow:0 30px 70px rgba(0,0,0,.45);position:relative;z-index:1}
+.leadership-photo img{width:100%;height:auto;display:block}
+.leadership-note{margin-top:1rem;font-size:.88rem;color:var(--muted-l);position:relative;z-index:1}
+
+/* ─── SEC HEADER ─── */
+.sec-hdr{text-align:center;margin-bottom:2.45rem}
+.sec-title{font-size:clamp(1.8rem,3.5vw,2.8rem);color:var(--cream2);margin-bottom:.85rem}
+.sec-title em{color:var(--gold-l);font-style:italic}
+.sec-sub{font-size:.95rem;color:var(--muted-l);max-width:480px;margin:0 auto}
+.gold-bar{width:50px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-l),var(--gold));background-size:200%;animation:shimmer 2.5s infinite;margin:.9rem auto 0}
+
+/* ─── AMBIANCE ─── */
+#ambiance{overflow:hidden}
+.amb-strip{display:flex;height:370px}
+.amb-panel{flex:1;position:relative;overflow:hidden;cursor:pointer;transition:flex .5s ease}
+.amb-panel:hover{flex:1.9}
+.amb-scene{width:100%;height:100%}
+.amb-ov{position:absolute;inset:0;transition:opacity .4s}
+.amb-content{position:absolute;bottom:1.8rem;left:1.5rem;right:1.5rem;opacity:0;transform:translateY(10px);transition:all .4s}
+.amb-panel:hover .amb-content{opacity:1;transform:translateY(0)}
+.amb-panel:hover .amb-ov{opacity:.35}
+.amb-lbl{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;letter-spacing:.05em}
+.amb-sub{font-size:.75rem;color:rgba(255,255,255,.7)}
+
+/* ─── FEATURES ─── */
+#features{padding:63px 0;background:var(--dark)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.35rem}
+.feat-card{background:var(--card);border:1px solid rgba(201,146,42,.28);border-radius:12px;padding:1.15rem 3.7rem 1.15rem 1.25rem;position:relative;overflow:hidden;transition:all .32s;cursor:default;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.feat-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 0% 0%,rgba(201,146,42,.07),transparent 60%);opacity:0;transition:opacity .3s}
+.feat-card:hover{transform:translateY(-5px);border-color:rgba(201,146,42,.55);box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.feat-card:hover::before{opacity:1}
+.feat-card.bc{border-color:rgba(3,63,170,.35)}.feat-card.bc:hover{border-color:rgba(3,63,170,.65)}
+.feat-card.bc::before{background:radial-gradient(ellipse at 0% 0%,rgba(3,63,170,.1),transparent 60%)}
+.feat-card.rc{border-color:rgba(219,28,43,.22)}.feat-card.rc:hover{border-color:rgba(219,28,43,.55)}
+.feat-card.rc::before{background:radial-gradient(ellipse at 0% 0%,rgba(219,28,43,.08),transparent 60%)}
+.feat-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:0;position:relative;z-index:1;flex-shrink:0}
+.ig{background:rgba(201,146,42,.15)}.ib{background:rgba(3,63,170,.2)}.ir{background:rgba(219,28,43,.15)}.igr{background:rgba(52,211,153,.15)}
+.feat-title{font-size:1rem;color:var(--cream2);font-family:'DM Sans',sans-serif;font-weight:700;margin-bottom:0;position:relative;z-index:1;flex:1;min-width:0}
+.feat-toggle{position:absolute;top:50%;right:1.15rem;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,146,42,.34);background:rgba(201,146,42,.1);color:var(--gold-l);cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .25s;z-index:2}
+.feat-toggle:hover{background:rgba(201,146,42,.18);border-color:rgba(201,146,42,.6);transform:translateY(-50%) scale(1.06)}
+.feat-card.open{padding-bottom:1.35rem}
+.feat-card.open .feat-toggle{top:1rem;transform:none;background:rgba(201,146,42,.18)}
+.feat-card.open .feat-toggle:hover{transform:scale(1.06)}
+.feat-desc{display:none;font-size:.83rem;color:var(--muted-l);line-height:1.65;position:relative;z-index:1;margin-top:.8rem;flex-basis:100%}
+.feat-list{display:none;list-style:none;margin-top:.9rem;position:relative;z-index:1;flex-basis:100%}
+.feat-card.open .feat-desc,.feat-card.open .feat-list{display:block}
+.feat-list li{font-size:.78rem;color:var(--muted-l);padding:3px 0;display:flex;align-items:center;gap:8px}
+.feat-list li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
+
+/* ─── PROBLEMS ─── */
+#problems{padding:63px 0;background:linear-gradient(180deg,rgba(14,8,4,.82) 0%,rgba(45,26,10,.88) 100%),url('img/esperando.jpg') center center/cover no-repeat}
+.prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.prob-list{display:flex;flex-direction:column;gap:.9rem}
+.prob-item{display:flex;align-items:flex-start;gap:1rem;padding:1.1rem;background:rgba(219,28,43,.05);border:1px solid rgba(219,28,43,.15);border-radius:8px;transition:all .3s}
+.prob-item:hover{background:rgba(219,28,43,.1);border-color:rgba(219,28,43,.35);transform:translateX(5px)}
+.prob-ico{width:40px;height:40px;border-radius:8px;background:rgba(219,28,43,.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.prob-h{color:var(--cream2);font-size:.9rem;font-family:'DM Sans',sans-serif;font-weight:600;margin-bottom:2px}
+.prob-p{font-size:.8rem;color:var(--muted-l)}
+.sol-card{background:var(--card);border:1px solid rgba(201,146,42,.32);border-radius:16px;padding:2.2rem;position:relative;overflow:hidden}
+.sol-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold),var(--red))}
+.sol-title{font-size:1.8rem;color:var(--cream2);margin-bottom:.7rem}
+.sol-title em{color:var(--gold-l);font-style:italic}
+.sol-list{list-style:none;margin:1.2rem 0 1.8rem}
+.sol-list li{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--cream2);padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sol-list li:last-child{border-bottom:none}
+
+/* ─── HOW ─── */
+#how{padding:63px 0;background:linear-gradient(180deg,var(--brown),var(--dark));position:relative;overflow:hidden}
+.how-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:18vw;color:rgba(201,146,42,.03);white-space:nowrap;pointer-events:none;user-select:none}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;position:relative;z-index:2}
+.step{text-align:center;padding:2.2rem 1.4rem;background:var(--card);border:1px solid rgba(201,146,42,.28);border-radius:12px;transition:all .3s;position:relative;overflow:hidden}
+.step::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold),var(--red));opacity:0;transition:opacity .3s}
+.step:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(0,0,0,.45)}.step:hover::after{opacity:1}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:5rem;line-height:1;color:rgba(201,146,42,.18);margin-bottom:.8rem}
+.step-ico{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-l));display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--dark);margin:0 auto .9rem;box-shadow:0 8px 24px rgba(201,146,42,.45)}
+.step-t{font-size:1.15rem;color:var(--gold-l);margin-bottom:.65rem}
+.step-p{font-size:.83rem;color:var(--muted-l);line-height:1.65}
+
+/* ─── RESULTS ─── */
+#results{padding:63px 0;background:linear-gradient(180deg,rgba(14,8,4,.84) 0%,rgba(14,8,4,.9) 100%),url('img/clientes.jpg') center center/cover no-repeat}
+.res-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.35rem;max-width:860px;margin:0 auto}
+.res-card{padding:2rem;border-radius:12px;display:flex;align-items:flex-start;gap:1.2rem;transition:all .3s}
+.res-card:hover{transform:translateY(-4px)}
+.gc{background:rgba(201,146,42,.1);border:1px solid rgba(201,146,42,.3)}
+.bc{background:rgba(3,63,170,.1);border:1px solid rgba(3,63,170,.3)}
+.rc{background:rgba(219,28,43,.1);border:1px solid rgba(219,28,43,.3)}
+.grc{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25)}
+.res-ico{width:48px;height:48px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.gc .res-ico{background:rgba(201,146,42,.2)}.bc .res-ico{background:rgba(3,63,170,.25)}.rc .res-ico{background:rgba(219,28,43,.2)}.grc .res-ico{background:rgba(52,211,153,.15)}
+.res-big{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;line-height:1;margin-bottom:2px}
+.gc .res-big{color:var(--gold-l)}.bc .res-big{color:#7aaaff}.rc .res-big{color:#ff7788}.grc .res-big{color:#34d399}
+.res-title{font-size:.9rem;font-weight:600;color:var(--cream2);margin-bottom:3px}
+.res-desc{font-size:.78rem;color:var(--muted-l)}
+
+/* ─── TESTIMONIOS ─── */
+#testi{padding:63px 0;background:linear-gradient(180deg,var(--dark),var(--brown))}
+.testi-main{max-width:760px;margin:0 auto;text-align:center;background:var(--card);border:1px solid rgba(201,146,42,.32);border-radius:16px;padding:3rem;position:relative;overflow:hidden;margin-bottom:2.5rem}
+.testi-main::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold),var(--red))}
+.quote-mark{font-family:'Playfair Display',serif;font-size:6rem;line-height:.4;color:var(--gold);opacity:.25;display:block;text-align:left}
+.testi-txt{font-family:'Playfair Display',serif;font-size:clamp(1.1rem,2vw,1.45rem);color:var(--cream2);font-style:italic;line-height:1.55;margin:1rem 0 1.8rem}
+.testi-author{display:flex;align-items:center;gap:1rem;justify-content:center}
+.av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;font-family:'Playfair Display',serif;background:linear-gradient(135deg,var(--blue),var(--red))}
+.stars{color:var(--gold-l);font-size:.9rem;margin-bottom:3px}
+.aut-name{font-size:.9rem;color:var(--cream2);font-weight:600}
+.aut-role{font-size:.72rem;color:var(--gold)}
+.testi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.35rem}
+.testi-mini{background:var(--card);border:1px solid rgba(201,146,42,.28);border-radius:12px;padding:1.5rem;text-align:center}
+.testi-mini-txt{font-size:.8rem;color:var(--muted-l);font-style:italic;margin:.5rem 0 1rem;line-height:1.6}
+.mini-name{font-size:.75rem;color:var(--cream2);font-weight:600}
+.mini-role{font-size:.68rem;color:var(--gold)}
+
+/* ─── PRICING ─── */
+#pricing{padding:63px 0;background:var(--brown)}
+.price-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.35rem;max-width:820px;margin:0 auto}
+.price-card{background:var(--card);border:1px solid rgba(201,146,42,.3);border-radius:16px;padding:2.2rem;position:relative;overflow:hidden;transition:all .3s}
+.price-card:hover{transform:translateY(-6px);box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.price-card.feat{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,146,42,.1),var(--card))}
+.price-card:last-child{grid-column:1/-1;max-width:520px;width:100%;justify-self:center;text-align:center;padding:1.8rem 2rem}
+.price-card:last-child .price-desc{margin-bottom:1.2rem}
+.feat-badge{position:absolute;top:1.1rem;right:1.1rem;background:linear-gradient(135deg,var(--gold),var(--gold-l));color:var(--dark);font-size:.6rem;font-weight:700;letter-spacing:.1em;padding:4px 10px;border-radius:20px;font-family:'Space Mono',monospace}
+.price-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;color:var(--gold-l);margin-bottom:.4rem}
+.price-val{font-family:'Playfair Display',serif;font-size:3rem;color:var(--cream2);line-height:1;margin-bottom:.2rem}
+.price-val sup{font-size:1.4rem;vertical-align:top;margin-top:.5rem}
+.price-val sub{font-size:1rem;color:var(--muted)}
+.price-desc{font-size:.8rem;color:var(--muted-l);margin-bottom:1.8rem}
+.price-feats{list-style:none;margin-bottom:1.8rem}
+.price-feats li{display:flex;align-items:center;gap:9px;font-size:.83rem;color:var(--cream2);padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.price-feats li:last-child{border-bottom:none}
+.oss-box{text-align:center;margin:2rem auto 0;padding:1.5rem;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.2);border-radius:12px;max-width:580px}
+.oss-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;font-size:.68rem;padding:4px 12px;border-radius:20px;font-family:'Space Mono',monospace;margin-bottom:.75rem}
+
+/* ─── CTA FINAL ─── */
+#cta-final{padding:70px 0;background:linear-gradient(135deg,var(--dark) 0%,var(--brown) 50%,var(--dark) 100%);position:relative;overflow:hidden}
+.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(3,63,170,.13),transparent 65%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(219,28,43,.08),transparent 50%);pointer-events:none}
+.pole-s{position:absolute;top:0;bottom:0;width:10px;background:repeating-linear-gradient(-45deg,var(--red) 0,var(--red) 14px,#fff 14px,#fff 20px,var(--blue) 20px,var(--blue) 34px,#fff 34px,#fff 40px);background-size:80px 80px;animation:pole 3s linear infinite}
+.pole-sl{left:0}.pole-sr{right:0;animation-direction:reverse}
+.cta-box{background:linear-gradient(135deg,rgba(3,63,170,.18),rgba(25,12,4,.92),rgba(219,28,43,.15));border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:3.5rem 2rem;max-width:760px;margin:0 auto;position:relative;overflow:hidden;text-align:center}
+.cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold),var(--red))}
+.cta-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 0%,rgba(201,146,42,.06),transparent 65%);pointer-events:none}
+.cta-title{font-size:clamp(2rem,4.5vw,3.5rem);color:var(--cream2);margin-bottom:.9rem}
+.cta-title em{color:var(--gold-l);font-style:italic}
+.cta-sub{font-size:1rem;color:var(--muted-l);max-width:440px;margin:0 auto 2.2rem}
+.cta-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.8rem}
+.cta-trust{display:flex;gap:1.8rem;justify-content:center;flex-wrap:wrap}
+
+/* ─── FOOTER ─── */
+footer{background:var(--dark);border-top:1px solid rgba(201,146,42,.2);padding:3rem 0 1.5rem}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;padding-bottom:2rem;border-bottom:1px solid rgba(201,146,42,.1);margin-bottom:1.5rem}
+.footer-brand p{font-size:.8rem;color:var(--muted);max-width:240px;line-height:1.7;margin-top:.9rem}
+.footer-col h5{font-family:'Space Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:.9rem}
+.footer-col a{display:block;color:var(--muted);text-decoration:none;font-size:.8rem;margin-bottom:.45rem;transition:color .2s}
+.footer-col a:hover{color:var(--cream)}
+.footer-bot{display:flex;justify-content:space-between;align-items:center;font-size:.73rem;color:var(--muted)}
+.f-social{display:flex;gap:.8rem}
+.f-social a{width:32px;height:32px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;transition:all .2s;font-size:.9rem}
+.f-social a:hover{background:rgba(201,146,42,.12);border-color:rgba(201,146,42,.35);color:var(--gold-l)}
+
+/* ─── MODAL ─── */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:1.5rem}
+.modal-overlay.open{display:flex}
+.modal{
+  width:100%;max-width:520px;
+  background:
+    linear-gradient(135deg,
+      rgba(3,25,70,.97) 0%,
+      rgba(12,5,3,.97) 50%,
+      rgba(90,8,14,.94) 100%
+    );
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:22px;
+  box-shadow:
+    0 50px 100px rgba(0,0,0,.75),
+    0 0 0 1px rgba(3,63,170,.2),
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 0 80px rgba(3,63,170,.15),
+    0 0 120px rgba(219,28,43,.06);
+  padding:2.5rem;
+  position:relative;overflow:hidden;
+  animation:modalIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+.modal::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 50% at 5% 0%,rgba(3,63,170,.22),transparent 55%),radial-gradient(ellipse 70% 55% at 95% 100%,rgba(219,28,43,.18),transparent 55%);pointer-events:none}
+.modal-top-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold-l),var(--red))}
+.modal-close{position:absolute;top:1.1rem;right:1.1rem;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.12);cursor:pointer;background:rgba(255,255,255,.07);color:rgba(255,255,255,.55);font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:1}
+.modal-close:hover{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.25)}
+.modal-logo{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-l),var(--red));display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1.2rem;box-shadow:0 8px 30px rgba(3,63,170,.45);position:relative;z-index:1;overflow:hidden}
+.modal-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.75rem;text-align:center;color:#fff;margin-bottom:.4rem;position:relative;z-index:1}
+.modal-sub{font-size:.88rem;color:rgba(255,255,255,.55);text-align:center;margin-bottom:1.8rem;position:relative;z-index:1;line-height:1.55}
+.ref-options{display:flex;flex-direction:column;gap:.65rem;position:relative;z-index:1}
+.ref-btn{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.04);cursor:pointer;transition:all .25s;text-align:left;width:100%;font-family:'DM Sans',sans-serif}
+.ref-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(201,146,42,.4);transform:translateX(5px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.ref-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ref-icon-emoji{font-size:1.7rem;line-height:1}
+.ref-icon-img{width:36px;height:36px;border-radius:9px;object-fit:cover;display:block;background:rgba(255,255,255,.08)}
+.ref-info{flex:1}
+.ref-name{font-size:.9rem;font-weight:600;color:#fff;margin-bottom:1px}
+.ref-desc{font-size:.72rem;color:rgba(255,255,255,.45)}
+.ref-arrow{color:rgba(255,255,255,.25);font-size:1rem;flex-shrink:0;transition:color .2s}
+.ref-btn:hover .ref-arrow{color:var(--gold-l)}
+.modal-skip{text-align:center;margin-top:1.1rem;position:relative;z-index:1}
+.modal-skip button{background:none;border:none;color:rgba(255,255,255,.28);font-size:.73rem;cursor:pointer;text-decoration:underline;transition:color .2s;font-family:'DM Sans',sans-serif}
+.modal-skip button:hover{color:rgba(255,255,255,.55)}
+.plans-modal{width:min(1120px,96vw);height:min(760px,88vh);background:rgba(10,5,3,.98);border:1px solid rgba(201,146,42,.28);border-radius:20px;box-shadow:0 40px 110px rgba(0,0,0,.8);position:relative;overflow:hidden;animation:modalIn .35s cubic-bezier(.34,1.56,.64,1)}
+.plans-modal-close{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(14,8,4,.84);color:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;z-index:3;transition:all .2s}
+.plans-modal-close:hover{background:rgba(201,146,42,.18);border-color:rgba(201,146,42,.48);color:var(--gold-l)}
+.plans-content{height:100%;overflow:auto;background:linear-gradient(180deg,#fffaf2,#eefbf4);color:#1d241f;padding:0}
+.plans-hero{background:linear-gradient(135deg,#059669,#065f46);color:#fff;padding:2.2rem 2.5rem;display:flex;align-items:center;gap:1.2rem}
+.plans-mark{width:58px;height:58px;border-radius:14px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.7rem;flex-shrink:0}
+.plans-hero h3{font-family:'DM Sans',sans-serif;font-size:1.65rem;margin-bottom:.25rem}
+.plans-hero p{color:rgba(255,255,255,.78);font-size:.95rem}
+.plans-intro,.plans-block,.plans-notes{padding:1.5rem 2.5rem}
+.plans-intro{border-bottom:1px solid rgba(6,95,70,.12);color:#4f5f56;line-height:1.65}
+.plans-kicker{font-size:.78rem;font-weight:800;color:#059669;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.9rem}
+.plans-table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 36px rgba(6,95,70,.09)}
+.plans-table th{background:#059669;color:#fff;text-align:left;padding:.85rem 1rem;font-size:.76rem;text-transform:uppercase;letter-spacing:.08em}
+.plans-table th:last-child,.plans-table td:last-child{text-align:right}
+.plans-table td{padding:.85rem 1rem;border-bottom:1px solid #e5e9e7;font-size:.9rem}
+.plans-table tr.active-plan{background:#dcfce7;font-weight:800}
+.plans-badge{display:inline-flex;background:#d1fae5;color:#065f46;border-radius:999px;padding:.22rem .65rem;font-size:.75rem;font-weight:800}
+.active-plan .plans-badge{background:#059669;color:#fff}
+.plans-calc{max-width:520px;background:#fff;border:2px solid #a7f3d0;border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(6,95,70,.08)}
+.plans-calc-head{background:#059669;color:#fff;padding:.9rem 1.2rem;font-weight:800}
+.plans-calc-body{padding:1.2rem}
+.plans-calc-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+.plans-counter{display:flex;align-items:center;gap:.65rem}
+.plans-counter button{width:34px;height:34px;border-radius:9px;border:2px solid #a7f3d0;background:#fff;color:#059669;font-size:1.25rem;font-weight:900;cursor:pointer}
+.plans-count{font-weight:900;min-width:28px;text-align:center;font-size:1.1rem}
+.plans-result{background:#f0fdf4;border:1px solid #a7f3d0;border-radius:12px;padding:1rem}
+.plans-result-name{color:#065f46;font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:.78rem;margin-bottom:.3rem}
+.plans-result-price{color:#059669;font-weight:900;font-size:2rem;line-height:1}
+.plans-result-label{color:#708078;font-size:.8rem;margin-top:.1rem}
+.plans-notes{background:#f0fdf4;border-top:1px solid #d1fae5;color:#56645d;font-size:.82rem;line-height:1.75}
+.plans-footer{background:#065f46;color:rgba(255,255,255,.74);text-align:center;padding:1rem;font-size:.8rem}
+.plans-actions{padding:1.2rem 2.5rem 2rem;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,0))}
+
+/* ─── MOBILE ─── */
+@media(max-width:900px){
+  .nav-in{height:62px;padding:0 1rem}
+  .nav-cta{padding:9px 16px;font-size:.74rem}
+  #hero{min-height:auto;padding-bottom:2rem}
+  .hero-in{grid-template-columns:1fr;text-align:center}
+  .hero-copy{min-height:420px;display:flex;flex-direction:column;justify-content:center}
+  .hero-visual{display:none}
+  .dash-card{display:none}
+  .float-notif,.float-rev{display:none}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr}
+  .price-grid{grid-template-columns:1fr;max-width:380px}
+  .stats-in{grid-template-columns:repeat(2,1fr)}
+  .stats-band{padding:1rem 0;position:relative;z-index:3}
+  .stat-i{padding:.85rem .8rem}
+  .stat-big{font-size:2.1rem}
+  .stat-desc{font-size:.72rem}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .hero-actions{justify-content:center}
+  .prob-grid{grid-template-columns:1fr}
+  .testi-row{grid-template-columns:1fr}
+  .res-grid{grid-template-columns:1fr}
+  .amb-strip{flex-direction:column;height:auto}
+  .amb-panel{height:180px}
+  .amb-content{opacity:1;transform:none}
+  .nav-links{display:none}
+}
+@media(max-width:600px){
+  .nav-in{height:58px}
+  .nav-cta{padding:8px 14px;font-size:.7rem}
+  .logo-text{font-size:.9rem}
+  .hero-bg-photo{opacity:.34}
+  .hero-copy{min-height:380px}
+  .feat-grid{grid-template-columns:1fr}
+  .stats-in{grid-template-columns:repeat(2,1fr)}
+  .stats-band{padding:.8rem 0}
+  .stats-in{padding:0 .85rem;gap:.2rem}
+  .stat-i{padding:.7rem .45rem}
+  .stat-big{font-size:1.75rem}
+  .stat-desc{font-size:.68rem;line-height:1.35}
+  #leadership{padding:38px 0}
+  #leadership::before{background-position:center center;background-size:420px 420px;mask-image:none;-webkit-mask-image:none;opacity:.11}
+  .leadership-wrap{padding:0 1rem}
+  .leadership-photo{border-radius:16px}
+  .leadership-note{font-size:.8rem}
+  .plans-modal{width:96vw;height:86vh}
+  .plans-hero{padding:1.7rem 1.2rem;align-items:flex-start}
+  .plans-mark{width:46px;height:46px;font-size:1.3rem}
+  .plans-hero h3{font-size:1.25rem}
+  .plans-intro,.plans-block,.plans-notes{padding:1.2rem}
+  .plans-table th,.plans-table td{padding:.7rem .5rem;font-size:.78rem}
+  .plans-calc-row{align-items:flex-start;flex-direction:column}
+  .footer-top{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── MODAL DE REFERIDO ─── -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-top-line"></div>
+    <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
+    <div class="modal-logo"><img src="img/agendora-oficial-min.png" alt="Agendora Barber"></div>
+    <h2 class="modal-title">¡Casi listo! 🎉</h2>
+    <p class="modal-sub">Antes de continuar, ¿cómo te enteraste<br>de Agendora Barber? Esto nos ayuda a mejorar.</p>
+    <div class="ref-options" id="ref-options">
+      <div style="text-align:center;padding:2rem;color:rgba(255,255,255,.35);font-size:.85rem">Cargando opciones...</div>
+    </div>
+    <!--div class="modal-skip">
+      <button onclick="redirectNoRef()">Prefiero no decirlo → continuar igual</button>
+    </div-->
+  </div>
+</div>
+
+<!-- ─── NAVBAR ─── -->
+<div class="modal-overlay" id="plans-modal">
+  <div class="plans-modal" role="dialog" aria-modal="true" aria-label="Todos los planes de Agendora">
+    <button class="plans-modal-close" onclick="closePlansModal()" aria-label="Cerrar">✕</button>
+    <div class="plans-content">
+      <div class="plans-hero">
+        <div class="plans-mark">A</div>
+        <div>
+          <h3>Agendora - Planes y precios</h3>
+          <p>Planes por cantidad de profesionales activos · Vigente 2026</p>
+        </div>
+      </div>
+      <div class="plans-intro">
+        <strong>Agendora</strong> es un sistema de agenda y gestion de citas para negocios con profesionales que brindan servicios. El precio depende de la cantidad de profesionales activos.
+      </div>
+      <div class="plans-block">
+        <div class="plans-kicker">Planes disponibles</div>
+        <table class="plans-table">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Profesionales</th>
+              <th>Precio mensual</th>
+            </tr>
+          </thead>
+          <tbody id="plans-modal-body"></tbody>
+        </table>
+      </div>
+      <div class="plans-block">
+        <div class="plans-kicker">Calcula tu plan</div>
+        <div class="plans-calc">
+          <div class="plans-calc-head">Cuantos profesionales tenes?</div>
+          <div class="plans-calc-body">
+            <div class="plans-calc-row">
+              <label>Cantidad de profesionales</label>
+              <div class="plans-counter">
+                <button type="button" onclick="changePlansProfessionals(-1)">-</button>
+                <span class="plans-count" id="plans-prof-count">1</span>
+                <button type="button" onclick="changePlansProfessionals(1)">+</button>
+              </div>
+            </div>
+            <div class="plans-result">
+              <div class="plans-result-name" id="plans-result-name">Plan Basico</div>
+              <div class="plans-result-price" id="plans-result-price">98.900</div>
+              <div class="plans-result-label" id="plans-result-label">Gs./mes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="plans-notes">
+        <strong>Notas:</strong><br>
+        · El plan se asigna automaticamente segun la cantidad de profesionales activos registrados.<br>
+        · Al agregar o quitar profesionales, tu plan se actualiza en la siguiente facturacion.<br>
+        · El pago es mensual anticipado. No hay contratos de permanencia minima.<br>
+        · La implementacion y carga inicial de datos tiene un costo unico a convenir.<br>
+        · Para mas de 50 profesionales, consultanos por un plan a medida.
+      </div>
+      <div class="plans-actions">
+        <button class="btn btn-gold" onclick="closePlansModal(); openModal();" style="padding:16px 34px">🚀 Empezar Gratis Ahora</button>
+      </div>
+      <div class="plans-footer"><strong>Agendora</strong> · Sistema de Agenda Paraguay</div>
+    </div>
+  </div>
+</div>
+
+<nav id="nav">
+  <div class="nav-in">
+    <a href="#" class="logo">
+      <div class="logo-icon"><img src="img/agendora-oficial-min.png" alt="Agendora Barber"></div>
+      <div class="logo-text"><em>AGENDORA</em> BARBER</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Modulos</a></li>
+      <li><a href="#how">Cómo funciona</a></li>
+      <li><a href="#testi">Opiniones</a></li>
+      <li><a href="#pricing">Planes</a></li>
+    </ul>
+    <a href="#pricing" class="btn btn-gold nav-cta">🚀 Empezar Gratis</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-bg-photo"></div>
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="pole pole-r"></div>
+  <div class="pole pole-r2"></div>
+
+  <div class="hero-in">
+    <div class="hero-copy">
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        Sistema activo para barberías &nbsp;·&nbsp; 2026
+      </div>
+      <h1 class="hero-title">
+        <span class="ht1">Tu Barbería,</span>
+        <span class="ht2">Más Organizada.</span>
+        <span class="ht3">Más Rentable.</span>
+      </h1>
+      <p class="hero-sub">Tus clientes reservan solos por internet o WhatsApp — sin que tengas que contestar el teléfono. Reciben recordatorios automáticos, y vos cobrás más sin trabajar más.</p>
+      <div class="hero-actions">
+        <button class="btn btn-gold" onclick="openModal()">🚀 Empezar Gratis Ahora </button>
+        <a href="#features" class="btn btn-outline">👀 Ver Cómo Funciona</a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-i">⚡ Listo en 15 minutos</div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="float-notif">
+        <span style="font-size:1rem">📅</span>
+        <span>Nuevo turno confirmado ✓</span>
+      </div>
+      <img class="app-shot" src="img/app.png" alt="Vista de la app Agendora Barber">
+      <div class="dash-card">
+        <div class="dash-head">
+          <div class="dash-title">Dashboard Agendora</div>
+          <div class="dash-date mono">HOY · 19 ABR</div>
+        </div>
+        <div class="dash-stats">
+          <div class="sbox"><div class="snum">12</div><div class="slabel">Turnos Hoy</div></div>
+          <div class="sbox b"><div class="snum">Gs. 1.280.000</div><div class="slabel">Ingresos</div></div>
+          <div class="sbox r"><div class="snum">8</div><div class="slabel">Nuevos</div></div>
+        </div>
+        <div class="appt-hdr">Próximos Turnos</div>
+        <div class="appt">
+          <div class="appt-t">10:00</div>
+          <div class="appt-av" style="background:linear-gradient(135deg,#033faa,#1a56cc)">CM</div>
+          <div style="flex:1"><div class="appt-n">Carlos Mendoza</div><div class="appt-s">Corte + Barba · 45 min</div></div>
+          <div class="badge-ok">✓ Confirmado</div>
+        </div>
+        <div class="appt">
+          <div class="appt-t">11:30</div>
+          <div class="appt-av" style="background:linear-gradient(135deg,#db1c2b,#f02637)">LR</div>
+          <div style="flex:1"><div class="appt-n">Luis Rodríguez</div><div class="appt-s">Solo Barba · 30 min</div></div>
+          <div class="badge-pend">⏳ Pendiente</div>
+        </div>
+        <div class="appt">
+          <div class="appt-t">2:00</div>
+          <div class="appt-av" style="background:linear-gradient(135deg,#c9922a,#e8b84b)">MT</div>
+          <div style="flex:1"><div class="appt-n">Miguel Torres</div><div class="appt-s">Corte + Diseño · 60 min</div></div>
+          <div class="badge-ok">✓ Confirmado</div>
+        </div>
+      </div>
+      <div class="float-rev">
+        <div class="rev-l">Este mes</div>
+        <div class="rev-v">Gs. 8.420.000</div>
+        <div class="rev-c">↑ +23% vs mes pasado</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── STATS BAND ─── -->
+<section id="leadership">
+  <div class="leadership-wrap">
+    <p class="leadership-note fu d1" style="padding-bottom: 2rem">El equipo que impulsa Agendora Barber:</p>
+    <div class="leadership-photo fu">
+      <img src="img/tres-hombres.png" alt="Directivos de Agendora Barber">
+    </div>
+    
+  </div>
+</section>
+<div class="stats-band">
+  <div class="stats-in">
+    <div class="stat-i fu"><div class="stat-big">24/7</div><div class="stat-desc">Tus clientes reservan solos, a cualquier hora</div></div>
+    <div class="stat-i fu d1"><div class="stat-big">0</div><div class="stat-desc">turnos perdidos por doble agendamiento</div></div>
+    <div class="stat-i fu d2"><div class="stat-big">-60%</div><div class="stat-desc">Menos clientes que no aparecen</div></div>
+    <div class="stat-i fu d3"><div class="stat-big">∞</div><div class="stat-desc">Clientes y barberos sin límite</div></div>
+  </div>
+</div>
+
+<!-- ─── AMBIANCE STRIP ─── -->
+<section id="ambiance">
+  <div class="amb-strip">
+    <div class="amb-panel">
+      <svg class="amb-scene" viewBox="0 0 400 370" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="370" fill="#1a0a03"/>
+        <rect x="0" y="305" width="400" height="65" fill="#0d0600"/>
+        <rect x="0" y="0" width="400" height="308" fill="#2a1508"/>
+        <rect x="0" y="180" width="400" height="2" fill="#c9922a" opacity=".22"/>
+        <rect x="0" y="38" width="400" height="2" fill="#c9922a" opacity=".13"/>
+        <rect x="80" y="18" width="240" height="188" rx="3" fill="none" stroke="#c9922a" stroke-width="2.5" opacity=".55"/>
+        <rect x="86" y="24" width="228" height="176" rx="2" fill="#150900" opacity=".85"/>
+        <rect x="92" y="30" width="216" height="164" rx="1" fill="none" stroke="#c9922a" stroke-width=".4" opacity=".22"/>
+        <ellipse cx="200" cy="112" rx="80" ry="58" fill="#f5a030" opacity=".04"/>
+        <ellipse cx="200" cy="312" rx="55" ry="7" fill="#090402" opacity=".8"/>
+        <rect x="194" y="252" width="12" height="63" fill="#8a6a40"/>
+        <rect x="180" y="305" width="40" height="11" rx="3" fill="#6b4a20"/>
+        <rect x="158" y="230" width="84" height="29" rx="5" fill="#3d2010"/><rect x="160" y="232" width="80" height="25" rx="4" fill="#4a2818"/>
+        <rect x="165" y="165" width="70" height="72" rx="5" fill="#3d2010"/><rect x="167" y="167" width="66" height="68" rx="4" fill="#4a2818"/>
+        <rect x="173" y="152" width="54" height="18" rx="7" fill="#3d2010"/>
+        <rect x="146" y="230" width="16" height="43" rx="4" fill="#3d2010"/>
+        <rect x="238" y="230" width="16" height="43" rx="4" fill="#3d2010"/>
+        <rect x="158" y="275" width="84" height="7" rx="2" fill="#5a3820"/>
+        <rect x="195" y="275" width="10" height="4" rx="2" fill="#c9922a" opacity=".6"/>
+        <polygon points="200,0 165,55 235,55" fill="#f5d98a" opacity=".04"/>
+        <rect x="42" y="76" width="16" height="192" rx="3" fill="#f0f0f0" opacity=".9"/>
+        <rect x="42" y="76" width="16" height="27" fill="#db1c2b" opacity=".95"/>
+        <rect x="42" y="113" width="16" height="27" fill="#033faa" opacity=".95"/>
+        <rect x="42" y="150" width="16" height="27" fill="#db1c2b" opacity=".95"/>
+        <rect x="42" y="187" width="16" height="27" fill="#033faa" opacity=".95"/>
+        <rect x="42" y="224" width="16" height="27" fill="#db1c2b" opacity=".95"/>
+        <ellipse cx="50" cy="76" rx="10" ry="5" fill="#e0e0e0"/>
+        <ellipse cx="50" cy="268" rx="10" ry="5" fill="#e0e0e0"/>
+        <text x="338" y="140" font-size="22" fill="#c9922a" opacity=".4" text-anchor="middle">✂</text>
+      </svg>
+      <div class="amb-ov" style="background:linear-gradient(to top,rgba(20,10,3,.92),rgba(20,10,3,.22))"></div>
+      <div class="amb-content"><div class="amb-lbl">Ambiente Clásico</div><div class="amb-sub">Tradición y elegancia en cada corte</div></div>
+    </div>
+
+    <div class="amb-panel">
+      <svg class="amb-scene" viewBox="0 0 400 370" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="370" fill="#030d26"/>
+        <defs><pattern id="g2" width="38" height="38" patternUnits="userSpaceOnUse"><path d="M38 0L0 0 0 38" fill="none" stroke="#033faa" stroke-width=".42" opacity=".42"/></pattern></defs>
+        <rect width="400" height="370" fill="url(#g2)"/>
+        <rect x="35" y="28" width="330" height="248" rx="10" fill="#071838" opacity=".95" stroke="#1a56cc" stroke-width="1"/>
+        <rect x="35" y="28" width="330" height="32" rx="10" fill="#033faa" opacity=".95"/>
+        <circle cx="54" cy="44" r="5" fill="#db1c2b" opacity=".85"/>
+        <circle cx="72" cy="44" r="5" fill="#c9922a" opacity=".85"/>
+        <circle cx="90" cy="44" r="5" fill="#34d399" opacity=".85"/>
+        <text x="200" y="48" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.8)" font-family="monospace">✂ Agendora — Panel de Control</text>
+        <rect x="46" y="70" width="140" height="196" rx="5" fill="#060f22" opacity=".9"/>
+        <rect x="46" y="70" width="140" height="24" rx="5" fill="#0d2250" opacity=".8"/>
+        <text x="116" y="86" text-anchor="middle" font-size="9" fill="#7aaaff" font-family="monospace">ABRIL 2026</text>
+        <text x="56" y="108" font-size="7" fill="#4a7aff" opacity=".8" font-family="monospace">L  M  X  J  V  S  D</text>
+        <rect x="56" y="116" width="12" height="12" rx="2" fill="#033faa" opacity=".7"/>
+        <rect x="72" y="116" width="12" height="12" rx="2" fill="#033faa" opacity=".35"/>
+        <rect x="88" y="116" width="12" height="12" rx="2" fill="#db1c2b" opacity=".75"/>
+        <rect x="104" y="116" width="12" height="12" rx="2" fill="#033faa" opacity=".5"/>
+        <rect x="56" y="132" width="12" height="12" rx="2" fill="#c9922a" opacity=".85"/>
+        <rect x="72" y="132" width="12" height="12" rx="2" fill="#033faa" opacity=".45"/>
+        <rect x="88" y="132" width="12" height="12" rx="2" fill="#034a3a" opacity=".7"/>
+        <rect x="104" y="132" width="12" height="12" rx="2" fill="#db1c2b" opacity=".55"/>
+        <rect x="120" y="132" width="12" height="12" rx="2" fill="#033faa" opacity=".65"/>
+        <rect x="197" y="70" width="158" height="56" rx="5" fill="#060f22" opacity=".9" stroke="#1a56cc" stroke-width=".5"/>
+        <text x="208" y="87" font-size="8" fill="#7aaaff" font-family="monospace">TURNOS HOY</text>
+        <text x="208" y="110" font-size="24" fill="white" font-family="sans-serif" font-weight="bold">12</text>
+        <rect x="197" y="135" width="158" height="56" rx="5" fill="#060f22" opacity=".9" stroke="#1a56cc" stroke-width=".5"/>
+        <text x="208" y="152" font-size="8" fill="#7aaaff" font-family="monospace">INGRESOS HOY</text>
+        <text x="208" y="175" font-size="17" fill="#c9922a" font-family="sans-serif" font-weight="bold">Gs. 1.280.000</text>
+        <rect x="197" y="200" width="158" height="56" rx="5" fill="#060f22" opacity=".9" stroke="#1a56cc" stroke-width=".5"/>
+        <text x="208" y="217" font-size="8" fill="#7aaaff" font-family="monospace">CLIENTES NUEVOS</text>
+        <text x="208" y="240" font-size="24" fill="#34d399" font-family="sans-serif" font-weight="bold">8</text>
+        <rect x="46" y="292" width="308" height="48" rx="8" fill="#0a2e20" opacity=".9" stroke="#25d366" stroke-width="1"/>
+        <text x="64" y="312" font-size="10" fill="#25d366" font-family="monospace">📱 WhatsApp — Recordatorio enviado</text>
+        <text x="64" y="330" font-size="8" fill="rgba(255,255,255,.65)" font-family="monospace">Carlos M. · "Tu turno es mañana 10:00 AM ✓"</text>
+      </svg>
+      <div class="amb-ov" style="background:linear-gradient(to top,rgba(3,13,38,.92),rgba(3,13,38,.22))"></div>
+      <div class="amb-content"><div class="amb-lbl">Control Inteligente</div><div class="amb-sub">Todo tu negocio en tiempo real</div></div>
+    </div>
+
+    <div class="amb-panel">
+      <svg class="amb-scene" viewBox="0 0 400 370" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="370" fill="#1a0405"/>
+        <defs><pattern id="diam" width="28" height="28" patternUnits="userSpaceOnUse"><polygon points="14,2 26,14 14,26 2,14" fill="none" stroke="#db1c2b" stroke-width=".38" opacity=".22"/></pattern></defs>
+        <rect width="400" height="370" fill="url(#diam)"/>
+        <rect x="36" y="46" width="328" height="195" rx="14" fill="#2d0610" opacity=".96" stroke="#db1c2b" stroke-width="1.5"/>
+        <rect x="36" y="46" width="328" height="52" rx="14" fill="#db1c2b" opacity=".75"/>
+        <text x="56" y="70" font-size="11" fill="rgba(255,255,255,.9)" font-family="monospace" font-weight="bold">AGENDORA BARBER</text>
+        <text x="56" y="86" font-size="8" fill="rgba(255,255,255,.55)" font-family="monospace">✦ MEMBRESÍA GOLD</text>
+        <text x="330" y="78" font-size="26" fill="#f5d98a" text-anchor="middle">★</text>
+        <text x="56" y="128" font-size="7" fill="rgba(255,255,255,.45)" font-family="monospace">TITULAR</text>
+        <text x="56" y="148" font-size="15" fill="white" font-family="sans-serif" font-weight="bold">Carlos Mendoza</text>
+        <text x="56" y="168" font-size="7" fill="rgba(255,255,255,.45)" font-family="monospace">VÁLIDA HASTA</text>
+        <text x="56" y="184" font-size="11" fill="#c9922a" font-family="monospace">12/2026</text>
+        <rect x="244" y="118" width="52" height="40" rx="4" fill="#c9922a" opacity=".35" stroke="#c9922a" stroke-width="1"/>
+        <rect x="252" y="126" width="36" height="24" rx="2" fill="none" stroke="#c9922a" stroke-width=".5" opacity=".5"/>
+        <text x="316" y="161" font-size="8" fill="rgba(255,255,255,.4)" font-family="monospace" text-anchor="middle">PUNTOS</text>
+        <text x="316" y="184" font-size="20" fill="#c9922a" font-family="sans-serif" font-weight="bold" text-anchor="middle">2.840</text>
+        <rect x="36" y="264" width="155" height="95" rx="8" fill="#2d0610" opacity=".92" stroke="#db1c2b" stroke-width="1"/>
+        <text x="52" y="283" font-size="8" fill="#ff7788" font-family="monospace">INGRESOS DEL CLUB</text>
+        <rect x="52" y="328" width="12" height="18" fill="#db1c2b" opacity=".5" rx="2"/>
+        <rect x="68" y="318" width="12" height="28" fill="#db1c2b" opacity=".65" rx="2"/>
+        <rect x="84" y="308" width="12" height="38" fill="#db1c2b" opacity=".75" rx="2"/>
+        <rect x="100" y="298" width="12" height="48" fill="#db1c2b" opacity=".85" rx="2"/>
+        <rect x="116" y="291" width="12" height="55" fill="#c9922a" opacity=".95" rx="2"/>
+        <text x="52" y="356" font-size="6" fill="rgba(255,255,255,.28)" font-family="monospace">DIC ENE FEB MAR ABR</text>
+        <rect x="201" y="264" width="163" height="95" rx="8" fill="#2d0610" opacity=".92" stroke="#db1c2b" stroke-width="1"/>
+        <text x="217" y="283" font-size="8" fill="#ff7788" font-family="monospace">COBROS AUTOMÁTICOS</text>
+        <text x="217" y="308" font-size="30" fill="#c9922a" font-family="sans-serif" font-weight="bold">34</text>
+        <text x="217" y="326" font-size="10" fill="white" opacity=".6" font-family="sans-serif">activos este mes</text>
+        <rect x="217" y="336" width="130" height="16" rx="8" fill="rgba(52,211,153,.15)" stroke="rgba(52,211,153,.4)" stroke-width="1"/>
+        <text x="282" y="347" text-anchor="middle" font-size="7.5" fill="#34d399" font-family="monospace">↑ +34% este mes</text>
+      </svg>
+      <div class="amb-ov" style="background:linear-gradient(to top,rgba(26,4,5,.92),rgba(26,4,5,.22))"></div>
+      <div class="amb-content"><div class="amb-lbl">Club VIP</div><div class="amb-sub">Membresías y pagos que se renuevan solos</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ─── -->
+<section id="features">
+  <div class="container">
+    <div class="sec-hdr fu">
+      <div class="tag">✦ Todo lo que necesitas</div>
+      <h2 class="sec-title">Una app que trabaja<br><em>mientras vos cortás</em></h2>
+      <p class="sec-sub">Sin tecnicismos, sin complicaciones. Solo más clientes, más orden y más plata.</p>
+      <div class="gold-bar"></div>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card fu">
+        <div class="feat-ico ig">📅</div>
+        <div class="feat-title">Reservas Online 24/7</div>
+        <div class="feat-desc">Tus clientes reservan solos por internet — de noche, de madrugada, cuando quieran. Sin que tengas que contestar el teléfono.</div>
+        <ul class="feat-list">
+          <li>Elige el profesional</li>
+          <li>Arrastra y suelta para cambiar turnos</li>
+          <li>Sin marcación doble, nunca</li>
+        </ul>
+      </div>
+      <div class="feat-card bc fu d1">
+        <div class="feat-ico ib">💬</div>
+        <div class="feat-title">Recordatorios por WhatsApp</div>
+        <div class="feat-desc">El sistema manda un mensaje automático a cada cliente antes de su turno. Menos olvidos, menos ausencias, más ingresos.</div>
+        <ul class="feat-list">
+          <li>Mensaje automático 24 horas antes</li>
+          <li>Mensaje automático 1 hora antes</li>
+          <li>También por correo si lo prefieren</li>
+        </ul>
+      </div>
+      <div class="feat-card rc fu d2">
+        <div class="feat-ico ir">👥</div>
+        <div class="feat-title">Tus Clientes, Organizados</div>
+        <div class="feat-desc">Historial completo de cada cliente: qué servicios prefiere, cuánto gasta, cuándo fue la última vez. Todo en un lugar.</div>
+        <ul class="feat-list">
+          <li>Historial de cortes por persona</li>
+          <li>Notas y preferencias del cliente</li>
+          <li>Sistema de puntos y fidelización</li>
+        </ul>
+      </div>
+      <div class="feat-card fu d1">
+        <div class="feat-ico igr">💰</div>
+        <div class="feat-title">Controlá tu Dinero</div>
+        <div class="feat-desc">Sabé exactamente cuánto ganás cada día, por servicio y por barbero. Sin calculadora, sin papel — todo automático.</div>
+        <ul class="feat-list">
+          <li>Reporte de ingresos diario</li>
+          <li>Comisiones por barbero automáticas</li>
+          <li>Cierre de caja simple</li>
+        </ul>
+      </div>
+      <div class="feat-card bc fu d2">
+        <div class="feat-ico ib">👑</div>
+        <div class="feat-title">Club de Membresías VIP</div>
+        <div class="feat-desc">Creá planes mensuales para tus clientes fieles. Ellos pagan solos cada mes y vos tenés ingresos garantizados.</div>
+        <ul class="feat-list">
+          <li>Cobro automático mensual con Metrepay y Tpago</li>
+          <li>Puntos y recompensas exclusivas</li>
+          <li>Panel especial para miembros</li>
+        </ul>
+      </div>
+      <div class="feat-card fu d3">
+        <div class="feat-ico ig">📊</div>
+        <div class="feat-title">Reportes Fáciles de Entender</div>
+        <div class="feat-desc">Gráficos claros de cuánto ganás, cuántos clientes tenés y cómo va tu negocio. Para tomar mejores decisiones.</div>
+        <ul class="feat-list">
+          <li>Panel visual de un solo vistazo</li>
+          <li>Comparativo semana a semana</li>
+          <li>Tus mejores servicios y horarios</li>
+        </ul>
+      </div>
+      <div class="feat-card rc fu">
+        <div class="feat-ico ir">🔔</div>
+        <div class="feat-title">Avisos Automáticos</div>
+        <div class="feat-desc">No más llamadas perdidas. El sistema avisa a tus clientes por WhatsApp, correo o notificación en el celular — vos elegís.</div>
+        <ul class="feat-list">
+          <li>Por WhatsApp (el más abierto)</li>
+          <li>Por correo electrónico</li>
+          <li>Notificación directa al celular</li>
+        </ul>
+      </div>
+      <div class="feat-card bc fu d1">
+        <div class="feat-ico ib">✂️</div>
+        <div class="feat-title">Cada barbero tiene su sistema</div>
+        <div class="feat-desc">Los barberos tienen un panel completo para gestionar sus turnos y tareas diarias.</div>
+        <ul class="feat-list">
+          <li>Información en tiempo real de próximos turnos</li>
+          <li>Reportes de rendimiento personal</li>
+          <li>Panel de control intuitivo</li>
+        </ul>
+      </div>
+      <div class="feat-card fu d2">
+        <div class="feat-ico ig">🏢</div>
+        <div class="feat-title">Para una o Varias Sedes</div>
+        <div class="feat-desc">¿Tenés más de una barbería? Manejá todas desde un solo sistema. Cada barbero ve solo sus turnos.</div>
+        <ul class="feat-list">
+          <li>Múltiples sucursales</li>
+          <li>Cada barbero con su acceso</li>
+          <li>Reportes por sede separados</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROBLEMS ─── -->
+<section id="problems">
+  <div class="container">
+    <div class="prob-grid">
+      <div class="fu">
+        <div class="tag">😤 El problema</div>
+        <h2 style="font-size:clamp(1.7rem,3vw,2.4rem);margin-bottom:1.8rem;color:var(--cream2)">Sin sistema, perdés<br><em style="color:var(--gold-l);font-style:italic">tiempo y plata cada día</em></h2>
+        <div class="prob-list">
+          <div class="prob-item">
+            <div class="prob-ico">📵</div>
+            <div><div class="prob-h">Llamadas que no llegás a contestar</div><div class="prob-p">El cliente llama, no atendés — y llama a otra barbería. Perdiste un turno sin saber.</div></div>
+          </div>
+          <div class="prob-item">
+            <div class="prob-ico">😤</div>
+            <div><div class="prob-h">Dos clientes a la misma hora</div><div class="prob-p">Pasa más de lo que querés admitir. Con Agendora, es imposible que pase.</div></div>
+          </div>
+          <div class="prob-item">
+            <div class="prob-ico">🙅</div>
+            <div><div class="prob-h">Clientes que no aparecen</div><div class="prob-p">Sin recordatorio, se les olvida. Y perdiste un turno que alguien más hubiera pagado.</div></div>
+          </div>
+          <div class="prob-item">
+            <div class="prob-ico">🤷</div>
+            <div><div class="prob-h">No sabés cuánto ganás exactamente</div><div class="prob-p">La agenda de papel no te dice si este mes fue mejor o peor que el anterior.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="sol-card fu d2">
+        <div class="tag">✅ La solución</div>
+        <h3 class="sol-title">Agendora lo resuelve<br><em>todo, solo.</em></h3>
+        <p style="font-size:.88rem;color:var(--muted-l);line-height:1.72">Configurás una vez y el sistema trabaja por vos: tus clientes reservan online, reciben recordatorios automáticos y vos sabés al instante cuánto estás ganando.</p>
+        <ul class="sol-list">
+          <li>📱 &nbsp;Reservas online que tus clientes hacen solos</li>
+          <li>💬 &nbsp;WhatsApp automático antes de cada turno</li>
+          <li>🚫 &nbsp;Jamás dos clientes a la misma hora</li>
+          <li>💵 &nbsp;Reporte de cuánto ganás en tiempo real</li>
+          <li>👑 &nbsp;Membresías que cobran solas cada mes</li>
+        </ul>
+        <button class="btn btn-gold" onclick="openModal()" style="width:100%;justify-content:center">✂️ Organizá tu Barbería Hoy</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW ─── -->
+<section id="how">
+  <div class="how-bg">BARBER</div>
+  <div class="container">
+    <div class="sec-hdr fu">
+      <div class="tag">⚡ Proceso</div>
+      <h2 class="sec-title">Funcionando en<br><em>menos de 15 minutos</em></h2>
+      <p class="sec-sub">No necesitás saber de tecnología. Es tan fácil como realizar un corte.</p>
+      <div class="gold-bar"></div>
+    </div>
+    <div class="steps">
+      <div class="step fu">
+        <div class="step-num">01</div>
+        <div class="step-ico">✍️</div>
+        <h3 class="step-t">Te Registrás</h3>
+        <p class="step-p">Creás tu cuenta en minutos: el nombre de tu barbería, tus barberos y qué servicios ofrecen. Sin formularios complicados.</p>
+      </div>
+      <div class="step fu d2">
+        <div class="step-num">02</div>
+        <div class="step-ico">⚙️</div>
+        <h3 class="step-t">Lo Configurás</h3>
+        <p class="step-p">Ponés los horarios, los precios y el número de WhatsApp. Te guiamos paso a paso — sin complicaciones.</p>
+      </div>
+      <div class="step fu d4">
+        <div class="step-num">03</div>
+        <div class="step-ico">🚀</div>
+        <h3 class="step-t">Tu Barbería Crece</h3>
+        <p class="step-p">Compartís tu link de reservas. Tus clientes agendan solos. Vos te enfocás en lo que hacés mejor: Tu Arte.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── RESULTS ─── -->
+<section id="results">
+  <div class="container">
+    <div class="sec-hdr fu">
+      <div class="tag">📈 Resultados reales</div>
+      <h2 class="sec-title">Lo que cambia cuando<br><em>usás Agendora</em></h2>
+      <div class="gold-bar"></div>
+    </div>
+    <div class="res-grid">
+      <div class="res-card gc fu"><div class="res-ico">💰</div><div><div class="res-big">+34%</div><div class="res-title">Más ingresos el primer mes</div><div class="res-desc">Menos turnos perdidos y más clientes que vuelven.</div></div></div>
+      <div class="res-card bc fu d1"><div class="res-ico">📵</div><div><div class="res-big">0</div><div class="res-title">Llamadas perdidas por reservas</div><div class="res-desc">Tus clientes reservan solos online, sin llamar.</div></div></div>
+      <div class="res-card rc fu d2"><div class="res-ico">🙅</div><div><div class="res-big">-60%</div><div class="res-title">Menos clientes que no aparecen</div><div class="res-desc">Los recordatorios de WhatsApp hacen su magia.</div></div></div>
+      <div class="res-card grc fu d3"><div class="res-ico">⏰</div><div><div class="res-big">2 hrs</div><div class="res-title">Menos tiempo administrando por día</div><div class="res-desc">Tiempo que ganás para enfocarte en cortar.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIOS ─── -->
+<!-- TESTIMONIOS OCULTO TEMPORALMENTE
+<section id="testi">
+  <div class="container">
+    <div class="sec-hdr fu">
+      <div class="tag">💬 Opiniones</div>
+      <h2 class="sec-title">Barberías que ya<br><em>cambiaron su juego</em></h2>
+      <div class="gold-bar"></div>
+    </div>
+    <div class="testi-main fu">
+      <div class="stars">★★★★★</div>
+      <span class="quote-mark">"</span>
+      <p class="testi-txt">Desde que uso Agendora, mi barbería funciona como un reloj. Mis clientes reservan solos, les llega el recordatorio por WhatsApp y yo tengo más tiempo para enfocarme en lo que realmente me gusta: el arte del barbero.</p>
+      <div class="testi-author">
+        <div class="av">CM</div>
+        <div>
+          <div class="stars" style="font-size:.8rem">★★★★★</div>
+          <div class="aut-name">Carlos Mendoza</div>
+          <div class="aut-role">Barbero Profesional · Ciudad del Este</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-row">
+      <div class="testi-mini fu"><div class="stars">★★★★★</div><p class="testi-mini-txt">"Las reservas online cambiaron todo. Ahora no pierdo ningun turno y mis clientes están contentos."</p><div class="mini-name">Luis R.</div><div class="mini-role">BarberShop Premium · Asunción</div></div>
+      <div class="testi-mini fu d2"><div class="stars">★★★★★</div><p class="testi-mini-txt">"Los reportes me ayudaron a entender cuánto ganaba realmente. Increíble lo que estaba dejando de ganar antes."</p><div class="mini-name">Miguel T.</div><div class="mini-role">The Barber Club · Encarnación</div></div>
+      <div class="testi-mini fu d4"><div class="stars">★★★★★</div><p class="testi-mini-txt">"El sistema de membresías es lo mejor. Mis clientes fieles pagan solos cada mes y yo tengo ingresos seguros."</p><div class="mini-name">Andrés P.</div><div class="mini-role">Fade & Style · CDE</div></div>
+    </div>
+  </div>
+</section>
+FIN TESTIMONIOS OCULTO TEMPORALMENTE -->
+
+<!-- ─── PRICING ─── -->
+<section id="pricing">
+  <div class="container">
+    <div class="sec-hdr fu">
+      <div class="tag">💳 Planes</div>
+      <h2 class="sec-title">Planes simples para<br><em>cada barbería</em></h2>
+      <p class="sec-sub">Sin letras chicas, sin sorpresas. Elegís el que más te conviene.</p>
+      <div class="gold-bar"></div>
+    </div>
+    <div class="price-grid">
+      <div class="price-card fu">
+        <div class="price-name">Básico</div>
+        <div class="price-desc">🚀 Ideal para un Barbero/Emprendedor</div>
+        <div class="price-val">Gs. 98.900<sub>/mes</sub></div>
+        <ul class="price-feats">
+          <li>✅ &nbsp;Para 1 barbero</li>
+          <li>✅ &nbsp;Reservas online 24/7</li>
+          <li>✅ &nbsp;Recordatorios por WhatsApp</li>
+          <li>✅ &nbsp;Agenda sincronizada en el celular</li>
+          <li>✅ &nbsp;Clientes e historial organizado</li>
+
+        </ul>
+        <button class="btn btn-outline" onclick="openModal()" style="width:100%;justify-content:center">Empezar con Básico</button>
+      </div>
+      <div class="price-card fu d1">
+        <div class="feat-badge">MÁS ELEGIDO</div>
+        <div class="price-name">Estandar</div>
+        <div class="price-desc">🚀 Para barberias que quieran automatizar todo!</div>
+        <div class="price-val">Gs. 189.900<sub>/mes</sub></div>
+        <ul class="price-feats">
+          <li>✅ &nbsp;Para 2 a 3 barberos</li>
+          <li>✅ &nbsp;Reservas online 24/7</li>
+          <li>✅ &nbsp;Recordatorios por WhatsApp</li>
+          <li>✅ &nbsp;Agenda sincronizada en el celular</li>
+          <li>✅ &nbsp;Clientes e historial organizado</li>
+        </ul>
+        <button class="btn btn-outline" onclick="openModal()" style="width:100%;justify-content:center">Empezar con Estandar</button>
+      </div>
+      <div class="price-card feat fu d2">
+        <div class="price-name">Personalizado</div>
+        <div class="price-desc">Elige el plan que se adapte a tu Barbería</div>
+        <button class="btn btn-gold" onclick="openPlansModal()" style="width:100%;justify-content:center">Ver todos los planes</button>
+      </div>
+    </div>
+    <div class="oss-box fu" style="margin-top:2rem">
+      <div class="oss-badge">🔒 Seguro y Confiable </div>
+      <p style="font-size:.83rem;color:var(--muted-l)"> Sabemos de la importancia de tus datos, por eso  <strong style="color:var(--cream2)">Agendora es seguro</strong> y nuestro equipo ha implementado todas las medidas de seguridad de la actualidad.</p>
+      <!-- <a href="https://github.com/pariteq/agendora" target="_blank" class="btn btn-glass" style="margin-top:1rem;justify-content:center">🐙 Ver en GitHub — Gratis</a> -->
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA FINAL ─── -->
+<section id="cta-final">
+  <div class="cta-bg"></div>
+  <div class="pole-s pole-sl"></div>
+  <div class="pole-s pole-sr"></div>
+  <div class="container">
+    <div class="fu">
+      <div class="cta-box">
+        <div class="cta-glow"></div>
+        <div style="font-size:3.5rem;margin-bottom:1rem;position:relative;z-index:1">✂️</div>
+        <div class="tag" style="margin:0 auto 1.4rem;position:relative;z-index:1">🔥 Sin excusas</div>
+        <h2 class="cta-title" style="position:relative;z-index:1">Tu pasión es el barbering.<br><em>La nuestra es que crezcas.</em></h2>
+        <p class="cta-sub" style="position:relative;z-index:1">Únete a las barberías que ya digitalizaron su negocio. Empieza hoy — sin tarjeta, sin compromiso, en 5 minutos.</p>
+        <div class="cta-btns" style="position:relative;z-index:1">
+          <button class="btn btn-gold" onclick="openModal()" style="font-size:1.05rem;padding:17px 38px">🚀 Empezar Gratis Ahora</button>
+          <a href="#features" class="btn btn-outline" style="font-size:1rem">👀 Ver Cómo Funciona</a>
+        </div>
+        <div class="cta-trust" style="position:relative;z-index:1">
+          <div class="trust-i">🔒 Sin tarjeta de crédito</div>
+          <div class="trust-i">💬 Soporte en español</div>
+          <div class="trust-i">⚡ Listo en 5 minutos</div>
+          <div class="trust-i">♾️ Sin límite de clientes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer id="contacto">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-icon" style="width:36px;height:36px;font-size:.95rem"><img src="img/agendora-oficial-min.png" alt="Agendora Barber"></div>
+          <div class="logo-text" style="font-size:.95rem"><em>AGENDORA</em> BARBER</div>
+        </div>
+        <p>La plataforma completa para barberías modernas. Sin complicaciones.</p>
+        <div class="oss-badge" style="margin-top:1rem">🔒 Seguro y Confiable</div>
+      </div>
+      <div class="footer-col">
+        <h5>Producto</h5>
+        <a href="#features">Funciones</a>
+        <a href="#how">Cómo funciona</a>
+        <a href="#pricing">Planes</a>
+        <a href="#testi">Opiniones</a>
+      </div>
+      <div class="footer-col">
+        <h5>Recursos</h5>
+        <a href="https://github.com/pariteq/agendora" target="_blank">GitHub</a>
+        <a href="#">Guía de inicio</a>
+        <a href="#">Preguntas frecuentes</a>
+      </div>
+      <div class="footer-col">
+        <h5>Comunidad</h5>
+        <a href="#">Discord</a>
+        <a href="#">Foro</a>
+        <a href="#">Contacto</a>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div>© 2026 Agendora Barber &nbsp;·&nbsp; <a href="https://pariteq.com/agendora" style="color:var(--gold);text-decoration:none">Licencia Abierta GPL-3.0</a></div>
+      <div class="f-social">
+        <a href="#" title="GitHub">🐙</a>
+        <a href="#" title="Discord">💬</a>
+        <a href="#" title="Instagram">📷</a>
+        <a href="#" title="WhatsApp">📱</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ─── REFERIDOS CONFIG ─── */
+let cfg = null;
+
+async function loadConfig(){
+  try{
+    const r = await fetch(`referidos.json?v=${Date.now()}`, {cache:'no-store'});
+    if(!r.ok) throw new Error(`No se pudo cargar referidos.json (${r.status})`);
+    cfg = await r.json();
+    if(!Array.isArray(cfg.referidos)) throw new Error('referidos.json no tiene un array "referidos"');
+  }catch(e){
+    console.error('No se pudo cargar referidos.json:', e);
+    cfg = {
+      redirect_base:"https://www.agendora.pariteq.com/index.php/installation",
+      referidos:[],
+      load_error:true
+    };
+  }
+  renderRefs();
+}
+
+function escapeHtml(value=''){
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[ch]));
+}
+
+function isImageIcon(icon=''){
+  return /^(?:\.?\/|img\/|https?:\/\/|data:image\/).+\.(?:png|jpe?g|webp|gif|svg)(?:[?#].*)?$/i.test(icon)
+    || /^data:image\//i.test(icon);
+}
+
+function renderIcon(icon, name){
+  const safeIcon = escapeHtml(icon || '•');
+  const safeName = escapeHtml(name || 'referido');
+  if(isImageIcon(icon)){
+    return `<span class="ref-icon"><img class="ref-icon-img" src="${safeIcon}" alt="${safeName}"></span>`;
+  }
+  return `<span class="ref-icon ref-icon-emoji">${safeIcon}</span>`;
+}
+
+function renderRefs(){
+  const c=document.getElementById('ref-options');
+  if(!cfg)return;
+  if(cfg.load_error){
+    c.innerHTML='<div style="text-align:center;padding:1.4rem;color:rgba(255,255,255,.55);font-size:.82rem;line-height:1.55">No se pudo cargar <strong style="color:var(--gold-l)">referidos.json</strong>.<br>Abrí la página desde el servidor local, no como archivo.</div>';
+    return;
+  }
+  if(!cfg.referidos.length){
+    c.innerHTML='<div style="text-align:center;padding:1.4rem;color:rgba(255,255,255,.45);font-size:.82rem">No hay referidos configurados.</div>';
+    return;
+  }
+  c.innerHTML=cfg.referidos.map(r=>`
+    <button class="ref-btn" onclick="handleRef('${escapeHtml(r.ref_param)}')">
+      ${renderIcon(r.icon, r.nombre)}
+      <div class="ref-info">
+        <div class="ref-name">${escapeHtml(r.nombre)}</div>
+        <div class="ref-desc">${escapeHtml(r.descripcion)}</div>
+      </div>
+      <span class="ref-arrow">→</span>
+    </button>
+  `).join('');
+}
+
+function handleRef(p){
+  const base=cfg?cfg.redirect_base:'https://www.agendora.pariteq.com/index.php/installation';
+  window.location.href=`${base}?ref=${p}`;
+}
+function redirectNoRef(){
+  const base=cfg?cfg.redirect_base:'https://www.agendora.pariteq.com/index.php/installation';
+  window.location.href=base;
+}
+
+/* ─── MODAL ─── */
+function initFeatureCards(){
+  document.querySelectorAll('.feat-card').forEach(card=>{
+    const title = card.querySelector('.feat-title');
+    if(!title || card.querySelector('.feat-toggle')) return;
+
+    const btn = document.createElement('button');
+    btn.className = 'feat-toggle';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', `Ampliar ${title.textContent.trim()}`);
+    btn.setAttribute('aria-expanded', 'false');
+    btn.textContent = '↓';
+
+    btn.addEventListener('click', ()=>{
+      const isOpen = card.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+      btn.textContent = isOpen ? '↑' : '↓';
+    });
+
+    title.insertAdjacentElement('afterend', btn);
+  });
+}
+
+function openModal(){
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+const PLANS_MODAL_DATA = [
+  {name:'Plan Basico', min:1, max:1, price:98900},
+  {name:'Plan Pequeno A', min:2, max:3, price:189900},
+  {name:'Plan Pequeno B', min:4, max:5, price:249900},
+  {name:'Plan Mediano A', min:6, max:7, price:369900},
+  {name:'Plan Mediano B', min:8, max:10, price:449900},
+  {name:'Plan Grande', min:11, max:15, price:689900},
+  {name:'Plan Premium', min:16, max:20, price:898900},
+  {name:'Plan Business', min:21, max:30, price:1198900},
+  {name:'Plan Enterprise', min:31, max:40, price:1489900},
+  {name:'Plan Corporativo', min:41, max:50, price:1789900}
+];
+let plansProfessionals = 1;
+
+function formatGs(value){
+  return value.toLocaleString('es-PY').replace(/,/g,'.');
+}
+
+function getPlansModalPlan(count){
+  return PLANS_MODAL_DATA.find(plan => count >= plan.min && count <= plan.max) || null;
+}
+
+function renderPlansModalTable(activePlan){
+  const body = document.getElementById('plans-modal-body');
+  if(!body) return;
+  body.innerHTML = PLANS_MODAL_DATA.map(plan=>{
+    const range = plan.min === plan.max ? `${plan.min} profesional` : `${plan.min} a ${plan.max} profesionales`;
+    const active = activePlan && activePlan.name === plan.name;
+    return `<tr class="${active ? 'active-plan' : ''}">
+      <td>${plan.name}</td>
+      <td><span class="plans-badge">${range}</span></td>
+      <td>${formatGs(plan.price)} Gs.</td>
+    </tr>`;
+  }).join('');
+}
+
+function updatePlansModal(){
+  const plan = getPlansModalPlan(plansProfessionals);
+  document.getElementById('plans-prof-count').textContent = plansProfessionals;
+
+  if(plan){
+    document.getElementById('plans-result-name').textContent = plan.name;
+    document.getElementById('plans-result-price').textContent = formatGs(plan.price);
+    document.getElementById('plans-result-price').className = 'plans-result-price';
+    document.getElementById('plans-result-label').style.display = '';
+  }else{
+    document.getElementById('plans-result-name').textContent = 'Plan a medida';
+    document.getElementById('plans-result-price').textContent = 'Consultanos';
+    document.getElementById('plans-result-price').className = 'plans-result-price';
+    document.getElementById('plans-result-label').style.display = 'none';
+  }
+
+  renderPlansModalTable(plan);
+}
+
+function changePlansProfessionals(delta){
+  plansProfessionals = Math.max(1, plansProfessionals + delta);
+  updatePlansModal();
+}
+
+function openPlansModal(){
+  updatePlansModal();
+  document.getElementById('plans-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePlansModal(){
+  document.getElementById('plans-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+document.getElementById('plans-modal').addEventListener('click',function(e){if(e.target===this)closePlansModal()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeModal();
+    closePlansModal();
+  }
+});
+
+/* ─── SCROLL FADE ─── */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')});
+},{threshold:.1,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.fu').forEach(el=>obs.observe(el));
+
+/* ─── NAVBAR ─── */
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').style.background=
+    window.scrollY>70?'rgba(9,4,2,.99)':'rgba(14,8,4,.9)';
+});
+
+loadConfig();
+initFeatureCards();
+</script>
+</body>
+</html>
