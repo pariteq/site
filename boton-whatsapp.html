@@ -1,0 +1,160 @@
+<!-- BOTÃO FLUTUANTE DO WHATSAPP -->
+<a id="whatsapp-float" href="#" aria-label="Abrir WhatsApp">
+    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp">
+</a>
+
+<!-- BOLHA DE AJUDA -->
+<div id="whatsapp-bubble">
+    ¿Necesitas ayuda con la instalación? ¡Hablemos!
+</div>
+
+<style>
+/* =========================
+   BOTÃO WHATSAPP
+========================= */
+#whatsapp-float {
+    position: fixed;
+    right: 20px;
+    bottom: 25px;
+    width: 60px;
+    height: 60px;
+    background: #25D366;
+    border-radius: 50%;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    cursor: pointer;
+    animation: pulse 2s infinite;
+    text-decoration: none;
+}
+
+/* Ícone do WhatsApp */
+#whatsapp-float img {
+    width: 32px;
+    height: 32px;
+    filter: invert(1); /* deixa branco */
+}
+
+/* =========================
+   BOLHA (NUVEM)
+========================= */
+#whatsapp-bubble {
+    position: fixed;
+    right: 90px;
+    bottom: 35px;
+    background: white;
+    color: #333;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    max-width: 220px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    z-index: 999998;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Setinha da bolha */
+#whatsapp-bubble::after {
+    content: "";
+    position: absolute;
+    right: -8px;
+    bottom: 15px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent transparent white;
+}
+
+/* =========================
+   ANIMAÇÕES
+========================= */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+</style>
+
+<script>
+/*
+========================================
+CONFIGURAÇÃO PRINCIPAL
+========================================
+*/
+const phoneNumber = "595986403404"; // número com DDI, sem + ou espaços
+
+/*
+========================================
+FUNÇÃO: pegar parâmetro "ref" da URL
+Ex: ?ref=homepro
+========================================
+*/
+function getRef() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("ref") || "directo"; // fallback se não tiver ref
+}
+
+/*
+========================================
+FUNÇÃO: montar mensagem do WhatsApp
+========================================
+*/
+function buildMessage() {
+    const ref = getRef();
+
+    let message = "Hola! Tengo interés en Agendora Barber.";
+    message += " Vengo a través de indicación: " + ref;
+
+    return encodeURIComponent(message);
+}
+
+/*
+========================================
+FUNÇÃO: detectar se é mobile
+========================================
+*/
+function isMobile() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+/*
+========================================
+FUNÇÃO: abrir WhatsApp
+========================================
+*/
+function openWhatsApp(e) {
+    e.preventDefault(); // evita comportamento padrão do link
+
+    const message = buildMessage();
+    let url;
+
+    if (isMobile()) {
+        // celular → abre app direto
+        url = `https://wa.me/${phoneNumber}?text=${message}`;
+        window.location.href = url;
+    } else {
+        // desktop → abre nova aba
+        url = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${message}`;
+        window.open(url, "_blank");
+    }
+}
+
+/*
+========================================
+INICIALIZAÇÃO
+========================================
+*/
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById("whatsapp-float");
+
+    if (btn) {
+        btn.addEventListener("click", openWhatsApp);
+    }
+});
+</script>
